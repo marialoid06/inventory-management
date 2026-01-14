@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config(); // Load environment variables
 
 const app = express();
-const port = process.env.PORT || 3001; // Use the port Render gives us, or 3001 locally
+const port = process.env.PORT ; // Use the port Render gives us, or 3001 locally
 const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-key';
 const path = require('path');
 
