@@ -8,18 +8,11 @@ require('dotenv').config(); // Load environment variables
 const app = express();
 const port = process.env.PORT ; // Use the port Render gives us, or 3001 locally
 const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret-key';
-const path = require('path');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-// ... after app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend'))); // Serve frontend files
-// ... routes ...
-// Catch-all for non-API routes
-app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
-});
+
 // --- Database Connection (Dynamic) ---
 // This configuration works for both LOCAL (using your .env file)
 // and DEPLOYMENT (using Render's environment variables).
