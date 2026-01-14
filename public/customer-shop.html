@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - InventoryPlus</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>InventoryPlus</h2></div>
+            <!-- *** UPDATED SIDEBAR ORDER *** -->
+            <ul>
+                <li class="active"><a href="/customer-shop.html">Shop Products</a></li>
+                <li><a href="/cart.html" id="cart-link">My Cart (0)</a></li>
+                <li><a href="/customer-my-orders.html">My Orders</a></li>
+                <li><a href="/customer-profile.html">Profile</a></li>
+            </ul>
+            <div class="sidebar-footer"><a href="#" id="logout-btn">Logout</a></div>
+        </nav>
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="page-title">Shop Products</h1>
+                <span id="welcome-message"></span>
+            </header>
+            <div class="search-container">
+                <input type="search" id="product-search" placeholder="Search products...">
+            </div>
+            <section class="content-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>In Stock</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shop-products-body"></tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    <script src="customer.js"></script>
+</body>
+</html>

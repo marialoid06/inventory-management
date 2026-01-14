@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart - InventoryPlus</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>InventoryPlus</h2></div>
+            <!-- *** UPDATED SIDEBAR ORDER *** -->
+            <ul>
+                <li><a href="/customer-shop.html">Shop Products</a></li>
+                <li class="active"><a href="/cart.html" id="cart-link">My Cart</a></li>
+                <li><a href="/customer-my-orders.html">My Orders</a></li>
+                <li><a href="/customer-profile.html">Profile</a></li>
+            </ul>
+            <div class="sidebar-footer"><a href="#" id="logout-btn">Logout</a></div>
+        </nav>
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="page-title">My Cart</h1>
+                <span id="welcome-message"></span>
+            </header>
+            <section class="content-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-table-body"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Grand Total:</td>
+                            <td id="cart-grand-total" style="font-weight: bold;">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </section>
+            <div style="text-align: right; margin-top: 2rem;">
+                <button class="btn" id="go-to-payment-btn">Proceed to Payment</button>
+            </div>
+            <div id="checkout-message" style="text-align: right;"></div>
+        </main>
+    </div>
+    <!-- Payment Modal -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2>Payment Details</h2>
+            <p style="margin-bottom: 1rem;">This is a simulation. No real card is required.</p>
+            <form id="payment-form">
+                <div class="form-group">
+                    <label>Card Number</label>
+                    <input type="text" value="**** **** **** 4242" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Name on Card</label>
+                    <input type="text" value="Test User" disabled>
+                </div>
+                <button type="submit" class="btn" id="checkout-btn" style="width: 100%;">Place Order (Pay)</button>
+            </form>
+            <div id="modal-message" style="margin-top: 1rem;"></div>
+        </div>
+    </div>
+    <script src="customer.js"></script>
+</body>
+</html>

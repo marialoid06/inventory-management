@@ -1,0 +1,142 @@
+/* --- Global Styles --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    color: #333;
+}
+
+/* --- Auth Card --- */
+.auth-container {
+    background: #ffffff;
+    width: 400px;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+}
+
+.auth-container h2 {
+    text-align: center;
+    color: #1a2b4d;
+    margin-bottom: 0.5rem;
+}
+
+.auth-container p.subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 2rem;
+}
+
+/* --- Form --- */
+.form-group {
+    margin-bottom: 1.25rem;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #444;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* --- Password Toggle --- */
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 39px; /* Adjust based on label */
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+/* --- Button --- */
+.btn {
+    width: 100%;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #4a90e2, #0056b3);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #0056b3, #4a90e2);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+}
+
+/* --- Links & Messages --- */
+.form-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.form-links a {
+    color: #0056b3;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.form-links a:hover {
+    text-decoration: underline;
+}
+
+p.bottom-link {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+/* For success/error messages */
+#message {
+    text-align: center;
+    margin-top: 1rem;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+.message-success {
+    background: #e6f7ec;
+    color: #006421;
+}
+.message-error {
+    background: #fdecea;
+    color: #a80000;
+}

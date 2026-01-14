@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Suppliers - InventoryPlus</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>InventoryPlus</h2></div>
+            <ul>
+                <li><a href="/admin-dashboard.html">Dashboard</a></li>
+                <li><a href="/admin-products.html">Products</a></li>
+                <li><a href="/admin-categories.html">Categories</a></li>
+                <li class="active"><a href="/admin-suppliers.html">Suppliers</a></li>
+                <li><a href="/admin-orders.html">Orders</a></li>
+                <li><a href="/admin-profile.html">Profile</a></li>
+            </ul>
+            <div class="sidebar-footer"><a href="#" id="logout-btn">Logout</a></div>
+        </nav>
+
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="page-title">Suppliers</h1>
+                <span id="welcome-message"></span>
+                <button class="btn" id="add-supplier-btn">+ Add Supplier</button>
+            </header>
+            <div class="search-container">
+                <input type="search" id="supplier-search" placeholder="Search suppliers...">
+            </div>
+            <section class="content-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suppliers-table-body"></tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Supplier Modal -->
+    <div class="modal" id="supplier-modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2 id="modal-title">Add New Supplier</h2>
+            <form id="supplier-form">
+                <input type="hidden" id="supplier-id">
+                <div class="form-group">
+                    <label for="supplier-name">Supplier Name *</label>
+                    <input type="text" id="supplier-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="supplier-email">Contact Email</label>
+                    <input type="email" id="supplier-email">
+                </div>
+                <div class="form-group">
+                    <label for="supplier-phone">Contact Phone</label>
+                    <input type="tel" id="supplier-phone">
+                </div>
+                <button type="submit" class="btn">Save Supplier</button>
+            </form>
+        </div>
+    </div>
+    <script src="admin.js"></script>
+</body>
+</html>

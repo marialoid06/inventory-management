@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Orders - InventoryPlus</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>InventoryPlus</h2></div>
+            <ul>
+                <li><a href="/admin-dashboard.html">Dashboard</a></li>
+                <li><a href="/admin-products.html">Products</a></li>
+                <li><a href="/admin-categories.html">Categories</a></li>
+                <li><a href="/admin-suppliers.html">Suppliers</a></li>
+                <li class="active"><a href="/admin-orders.html">Orders</a></li>
+                <li><a href="/admin-profile.html">Profile</a></li>
+            </ul>
+            <div class="sidebar-footer"><a href="#" id="logout-btn">Logout</a></div>
+        </nav>
+
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="page-title">All Orders</h1>
+                <span id="welcome-message"></span>
+            </header>
+            <div class="search-container">
+                <input type="search" id="order-search" placeholder="Search by Order ID or Customer...">
+            </div>
+            <section class="content-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body"></tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- *** NEW: Invoice Modal *** -->
+    <div class="modal" id="invoice-modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-invoice-modal">&times;</span>
+            <h2 id="invoice-title">Order Details</h2>
+            <div id="invoice-info" style="margin-bottom: 1rem;">
+                <p><strong>Order ID:</strong> <span id="invoice-order-id"></span></p>
+                <p><strong>Customer:</strong> <span id="invoice-customer-name"></span></p>
+                <p><strong>Order Date:</strong> <span id="invoice-order-date"></span></p>
+                <p><strong>Status:</strong> <span id="invoice-order-status"></span></p>
+            </div>
+            <section class="content-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoice-items-body">
+                        <!-- JS will fill this -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="text-align: right; font-weight: bold;">Grand Total:</td>
+                            <td id="invoice-grand-total" style="font-weight: bold;">$0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

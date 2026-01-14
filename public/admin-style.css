@@ -1,0 +1,306 @@
+/* public/admin-style.css */
+
+/* Reset some auth styles */
+body {
+    display: block;
+    place-items: normal;
+    background: #f0f2f5;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+}
+
+.admin-layout {
+    /* Changed from display:flex */
+    display: block;
+    position: relative;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    width: 250px;
+    background: #1a2b4d;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    /* --- FIX: This makes the sidebar stay in place --- */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid #3a4b6d;
+}
+
+.sidebar-header h2 {
+    margin: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    /* --- FIX: Allows sidebar to scroll if it has too many links --- */
+    overflow-y: auto;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 1rem 1.5rem;
+    color: #e0e0e0;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.sidebar ul li a:hover {
+    background: #4a90e2;
+    color: #fff;
+}
+
+.sidebar ul li.active a {
+    background: #4a90e2;
+    color: #fff;
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #3a4b6d;
+}
+.sidebar-footer a {
+    color: #f44336;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* --- Main Content --- */
+.main-content {
+    flex-grow: 1;
+    padding: 2rem;
+
+    /* --- FIX: Pushes the main content over so it doesn't hide under the sidebar --- */
+    margin-left: 250px;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.main-header h1 {
+    color: #1a2b4d;
+    margin: 0;
+}
+
+.main-header span#welcome-message {
+    color: #333;
+    font-weight: 500;
+    font-size: 1.1rem;
+    margin-left: auto;
+    margin-right: 2rem;
+}
+
+/* --- Widgets --- */
+.dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.widget-card {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.widget-card h3 {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.widget-card p {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #1a2b4d;
+    margin: 0;
+}
+
+/* --- Table --- */
+.dashboard-table, .content-table {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.dashboard-table h2, .content-table h2 {
+    margin-bottom: 1rem;
+    color: #1a2b4d;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+    vertical-align: middle;
+}
+
+th {
+    background: #f9f9f9;
+    font-weight: 600;
+}
+
+/* --- Search --- */
+.search-container {
+    margin-bottom: 1.5rem;
+}
+.search-container input {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+/* --- Buttons --- */
+.btn-edit, .btn-delete {
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+    font-family: 'Poppins', sans-serif;
+}
+.btn-edit {
+    background-color: #ffc107;
+    color: #333;
+}
+.btn-delete {
+    background-color: #f44336;
+    color: white;
+}
+.main-header .btn {
+    width: auto;
+    font-weight: 500;
+}
+
+/* --- Modal --- */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.5);
+
+    /* --- THIS IS THE FIX --- */
+    /* Use flexbox to center the child */
+    align-items: center;
+    justify-content: center;
+}
+    
+.modal-content {
+    background-color: #fefefe;
+    padding: 2rem;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    position: relative;
+    
+    /* --- FIX: Prevents modal from being too tall --- */
+    margin: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.close-btn {
+    color: #aaa;
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-btn:hover {
+    color: #000;
+}
+
+/* --- Profile Forms --- */
+.profile-forms {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+.form-card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.form-card h2 {
+    color: #1a2b4d;
+    margin-bottom: 1.5rem;
+}
+.form-card .form-group input[disabled] {
+    background: #eee;
+}
+
+/* --- Message Banners --- */
+.message-success {
+    background: #e6f7ec;
+    color: #006421;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+.message-error {
+    background: #fdecea;
+    color: #a80000;
+    padding: 0.8rem;
+    border-radius: 6px;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+/* --- Password Icon Toggle --- */
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 39px; /* Adjust based on label */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+}
+.toggle-password svg {
+    width: 18px;
+    height: 18px;
+}
+
+@media (max-width: 900px) {
+    .profile-forms {
+        grid-template-columns: 1fr;
+    }
+}

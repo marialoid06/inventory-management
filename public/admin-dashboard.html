@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - InventoryPlus</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <nav class="sidebar">
+            <div class="sidebar-header"><h2>InventoryPlus</h2></div>
+            <ul>
+                <li class="active"><a href="/admin-dashboard.html">Dashboard</a></li>
+                <li><a href="/admin-products.html">Products</a></li>
+                <li><a href="/admin-categories.html">Categories</a></li>
+                <li><a href="/admin-suppliers.html">Suppliers</a></li>
+                <li><a href="/admin-orders.html">Orders</a></li>
+                <li><a href="/admin-profile.html">Profile</a></li>
+            </ul>
+            <div class="sidebar-footer"><a href="#" id="logout-btn">Logout</a></div>
+        </nav>
+
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="page-title">Dashboard</h1>
+                <span id="welcome-message"></span>
+            </header>
+            
+            <section class="dashboard-widgets">
+                <div class="widget-card">
+                    <h3>Total Products</h3>
+                    <p id="total-products">0</p>
+                </div>
+                <div class="widget-card">
+                    <h3>Total Suppliers</h3>
+                    <p id="total-suppliers">0</p>
+                </div>
+                <div class="widget-card">
+                    <h3>Inventory Value</h3>
+                    <p id="inventory-value">$0.00</p>
+                </div>
+            </section>
+
+            <section class="dashboard-table">
+                <h2>Low Stock Items (15 or less)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Stock Left</th>
+                        </tr>
+                    </thead>
+                    <tbody id="low-stock-table-body">
+                        <!-- JS Injected -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    <script src="admin.js"></script>
+</body>
+</html>
