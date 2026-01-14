@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend'))); // Serve frontend files
 // ... routes ...
 // Catch-all for non-API routes
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 // --- Database Connection (Dynamic) ---
