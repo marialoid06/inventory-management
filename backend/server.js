@@ -16,7 +16,11 @@ if (!process.env.JWT_SECRET) {
 }
 
 // ===== MIDDLEWARE =====
-app.use(cors());
+app.use(cors({
+    origin: '*', // or your frontend Render URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
