@@ -12,31 +12,39 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const sendPasswordResetEmail = async (toEmail, token) => {
-    const resetUrl = `http://localhost:3000/reset-password.html?token=${token}`;
+const sendResetEmail = async (email, token) => {
+    // Check if transporter works
+    try {
+        await transporter.verify();
+        console.log("📧 SMTP Server is ready to take messages");
+    } catch (error) {
+        console.error("❌ SMTP Connection Error:", error);
+        return;
+    }
+
+    const domain = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const resetLink = `${domain}/reset-password.html?token=${token}`;
 
     const mailOptions = {
-        from: '"WMS Pro Admin" <noreply@wms-pro.com>',
-        to: toEmail,
-        subject: 'Your Password Reset Link',
+        from: `"Inventory Support" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Password Reset Request',
         html: `
-            <p>You requested a password reset for your WMS Pro account.</p>
-            <p>Please click the link below to set a new password. This link is valid for 1 hour.</p>
-            <a href="${resetUrl}" style="padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-                Reset Your Password
-            </a>
-            <p>If you did not request this, please ignore this email.</p>
-        `,
+            <h3>Password Reset</h3>
+            <p>Click below to reset your password:</p>
+            <a href="${resetLink}">Reset Password</a>
+        `
     };
 
     try {
         const info = await transporter.sendMail(mailOptions);
-        console.log('Message sent: %s', info.messageId);
-        // This is the URL to view your FAKE email in the browser
-        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        console.log("✅ Email sent: %s", info.messageId);
+        console.log("🔗 Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        return info;
     } catch (error) {
-        console.error('Error sending email:', error);
+        console.error('❌ Email sending failed:', error);
+        throw error;
     }
 };
 
-module.exports = { sendPasswordResetEmail };
+module.exports = { sendResetEmail };
