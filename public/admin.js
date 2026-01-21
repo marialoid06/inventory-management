@@ -1,8 +1,21 @@
-// public/admin.js
 document.addEventListener('DOMContentLoaded', () => {
+    // --- GLOBAL VARIABLES & SECURITY ---
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
 
-    // --- 1. API Helper (MOVED TO TOP) ---
+    // 1. Security Redirect
+    if (!token && !['/login.html', '/register.html', '/forgot-password.html', '/reset-password.html'].some(path => window.location.pathname.endsWith(path))) {
+        window.location.href = '/login.html';
+        return;
+    }
+
+    if (user && user.role !== 'admin' && !window.location.pathname.endsWith('/login.html')) {
+        // Double check: if logged in as customer, kick them out of admin pages
+        window.location.href = '/customer-shop.html'; 
+        return;
+    }
+
+    // --- 2. API HELPER ---
     const api = async (method, url, body = null) => {
         const headers = { 'Authorization': `Bearer ${token}` };
         const options = { method, headers };
@@ -11,130 +24,108 @@ document.addEventListener('DOMContentLoaded', () => {
             options.body = JSON.stringify(body);
         }
         
-        const response = await fetch(url, options);
-        
-        if (response.status === 401 || response.status === 403) {
-            localStorage.removeItem('token');
-            window.location.href = '/login.html';
-            return null;
-        }
-        
-        const text = await response.text();
-        if (!text) return { message: 'Success' }; // Handle empty responses
-
-        let data;
         try {
-            data = JSON.parse(text);
-        } catch (e) {
-            console.error("Failed to parse JSON:", text);
-            return { message: 'Error parsing response' };
-        }
-        
-        if (!response.ok) {
-            throw new Error(data.message || 'An error occurred');
-        }
-        
-        return data;
-    };
-
-    // --- 0. Global Setup: Get user info (NOW AFTER API IS DEFINED) ---
-    const welcomeMessageEl = document.getElementById('welcome-message');
-    if (welcomeMessageEl) {
-        api('GET', '/api/admin/profile/basic').then(user => {
-            if (user && user.username) {
-                welcomeMessageEl.textContent = `Welcome, ${user.username}!`;
+            const response = await fetch(url, options);
+            if (response.status === 401 || response.status === 403) {
+                localStorage.clear(); // Clear everything
+                window.location.href = '/login.html';
+                return null;
             }
-        }).catch(err => console.error("Error fetching admin name", err));
-    }
-
-    // --- 1. Security Check & Global Helpers ---
-    if (!token && !window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('register.html')  && !window.location.pathname.endsWith('forgot-password.html') && !window.location.pathname.endsWith('reset-password.html')) {
-        window.location.href = '/login.html';
-        return;
-    }
-
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            localStorage.removeItem('token');
-            window.location.href = '/login.html';
-        });
-    }
-    
-    // Helper to show messages
-    const showMessage = (elementId, message, isSuccess) => {
-        const el = document.getElementById(elementId);
-        if(el) {
-            el.textContent = message;
-            el.className = isSuccess ? 'message-success' : 'message-error';
-            setTimeout(() => { if (el) el.textContent = ''; }, 3000);
+            const text = await response.text();
+            if (!text) return { message: 'Success' }; 
+            
+            const data = JSON.parse(text);
+            if (!response.ok) throw new Error(data.message || 'An error occurred');
+            return data;
+        } catch (e) {
+            console.error("API Error:", e);
+            throw e;
         }
     };
 
-    // Helper for password icon toggles
-    const setupPasswordToggles = () => {
-        document.querySelectorAll('.toggle-password').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const input = btn.previousElementSibling;
-                const showIcon = btn.querySelector('.icon-show');
-                const hideIcon = btn.querySelector('.icon-hide');
-                
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    showIcon.style.display = 'none';
-                    hideIcon.style.display = 'inline';
-                } else {
-                    input.type = 'password';
-                    showIcon.style.display = 'inline';
-                    hideIcon.style.display = 'none';
-                }
-            });
-        });
+    // --- 3. UTILITIES (Debounce & UI) ---
+    
+    // Prevents API spamming while searching
+    const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
     };
 
-    // --- 2. Page-Specific Logic ---
+    // Highlight current page in Sidebar
+    const navLinks = document.querySelectorAll('.sidebar ul li a'); // Adjust selector to match your HTML
+    navLinks.forEach(link => {
+        if (link.href === window.location.href) {
+            link.classList.add('active'); // Ensure your CSS has an .active class
+        }
+    });
+
+    // Password Toggle Helper
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const input = btn.previousElementSibling;
+            const showIcon = btn.querySelector('.icon-show');
+            const hideIcon = btn.querySelector('.icon-hide');
+            if (input.type === 'password') {
+                input.type = 'text';
+                showIcon.style.display = 'none';
+                hideIcon.style.display = 'inline';
+            } else {
+                input.type = 'password';
+                showIcon.style.display = 'inline';
+                hideIcon.style.display = 'none';
+            }
+        });
+    });
+
+    // --- 4. PAGE ROUTING LOGIC ---
     const page = window.location.pathname;
-    setupPasswordToggles();
 
     // --- ADMIN DASHBOARD ---
     if (page.endsWith('/admin-dashboard.html') || page.endsWith('/')) {
+        const welcomeMsg = document.getElementById('welcome-message');
+        if(user && welcomeMsg) welcomeMsg.textContent = `Welcome, ${user.first_name || 'Admin'}!`;
+
         api('GET', '/api/admin/stats').then(data => {
             if (data) {
-                document.getElementById('total-products').textContent = data.totalProducts;
-                document.getElementById('total-suppliers').textContent = data.totalSuppliers;
-                document.getElementById('inventory-value').textContent = `$${parseFloat(data.inventoryValue).toFixed(2)}`;
+                document.getElementById('total-products').textContent = data.totalProducts || 0;
+                document.getElementById('total-suppliers').textContent = data.totalSuppliers || 0;
+                document.getElementById('inventory-value').textContent = `$${parseFloat(data.inventoryValue || 0).toFixed(2)}`;
             }
-        }).catch(err => console.error(err));
+        });
 
         api('GET', '/api/admin/low-stock').then(data => {
-            if (data) {
-                const tableBody = document.getElementById('low-stock-table-body');
-                tableBody.innerHTML = '';
-                if (data.length === 0) tableBody.innerHTML = '<tr><td colspan="3">No low stock items!</td></tr>';
+            const tbody = document.getElementById('low-stock-table-body');
+            tbody.innerHTML = '';
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3">No low stock items!</td></tr>';
+            } else {
                 data.forEach(item => {
-                    tableBody.innerHTML += `<tr><td>${item.product_id}</td><td>${item.product_name}</td><td>${item.stock}</td></tr>`;
+                    tbody.innerHTML += `<tr><td>${item.product_id}</td><td>${item.product_name}</td><td>${item.stock}</td></tr>`;
                 });
             }
-        }).catch(err => console.error(err));
+        });
     }
 
     // --- ADMIN PRODUCTS ---
     if (page.endsWith('/admin-products.html')) {
-        // ... (this logic is unchanged from the previous step) ...
         const tableBody = document.getElementById('products-table-body');
         const modal = document.getElementById('product-modal');
         const form = document.getElementById('product-form');
         const searchInput = document.getElementById('product-search');
-        const catSelect = document.getElementById('product-category');
-        const supSelect = document.getElementById('product-supplier');
-        let categories = [];
-        let suppliers = [];
 
+        // Load Products with Sorting logic (Newest First)
         const loadProducts = (search = '') => {
             api('GET', `/api/admin/products?search=${search}`).then(products => {
                 tableBody.innerHTML = '';
                 if (!products) return;
+                
+                // CLIENT SIDE SORT: Ensure Newest (Higher ID) is at top
+                // Remove this line if your SQL already handles "ORDER BY product_id DESC"
+                products.sort((a, b) => b.product_id - a.product_id); 
+
                 products.forEach(p => {
                     tableBody.innerHTML += `
                         <tr>
@@ -143,49 +134,60 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${p.category_name || 'N/A'}</td>
                             <td>${p.supplier_name || 'N/A'}</td>
                             <td>${p.stock}</td>
-                            <td>$${p.cost_price || 0}</td>
-                            <td>$${p.selling_price || 0}</td>
+                            <td>$${parseFloat(p.cost_price).toFixed(2)}</td>
+                            <td>$${parseFloat(p.selling_price).toFixed(2)}</td>
                             <td>
                                 <button class="btn-edit" data-id="${p.product_id}">Edit</button>
                                 <button class="btn-delete" data-id="${p.product_id}">Delete</button>
                             </td>
-                        </tr>
-                    `;
+                        </tr>`;
                 });
-            }).catch(err => console.error(err));
-        };
-        
-        const loadDropdowns = async () => {
-            try {
-                categories = await api('GET', '/api/admin/categories');
-                suppliers = await api('GET', '/api/admin/suppliers');
-                catSelect.innerHTML = '<option value="">Select Category</option>';
-                supSelect.innerHTML = '<option value="">Select Supplier</option>';
-                categories.forEach(c => catSelect.innerHTML += `<option value="${c.category_id}">${c.category_name}</option>`);
-                suppliers.forEach(s => supSelect.innerHTML += `<option value="${s.supplier_id}">${s.supplier_name}</option>`);
-            } catch(err) { console.error(err); }
+            });
         };
 
-        searchInput.addEventListener('input', (e) => loadProducts(e.target.value));
-        
+        // Populate Dropdowns
+        const loadDropdowns = async () => {
+            const [cats, sups] = await Promise.all([
+                api('GET', '/api/admin/categories'),
+                api('GET', '/api/admin/suppliers')
+            ]);
+            
+            const catSelect = document.getElementById('product-category');
+            const supSelect = document.getElementById('product-supplier');
+            
+            catSelect.innerHTML = '<option value="">Select Category</option>';
+            cats.forEach(c => catSelect.innerHTML += `<option value="${c.category_id}">${c.category_name}</option>`);
+            
+            supSelect.innerHTML = '<option value="">Select Supplier</option>';
+            sups.forEach(s => supSelect.innerHTML += `<option value="${s.supplier_id}">${s.supplier_name}</option>`);
+        };
+
+        // Debounced Search
+        searchInput.addEventListener('input', debounce((e) => loadProducts(e.target.value), 300));
+
+        // Add Button
         document.getElementById('add-product-btn').addEventListener('click', () => {
             form.reset();
             document.getElementById('product-id').value = '';
             document.getElementById('modal-title').textContent = 'Add New Product';
             modal.style.display = 'flex';
         });
+
         document.getElementById('close-modal').addEventListener('click', () => modal.style.display = 'none');
-        
+
+        // Form Submit
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const productId = document.getElementById('product-id').value;
+            
+            // Validate and Format Data for Schema
             const productData = {
                 product_name: document.getElementById('product-name').value,
-                category_id: document.getElementById('product-category').value,
-                supplier_id: document.getElementById('product-supplier').value,
-                stock: document.getElementById('product-stock').value,
-                cost_price: document.getElementById('product-cost').value,
-                selling_price: document.getElementById('product-selling').value,
+                category_id: parseInt(document.getElementById('product-category').value),
+                supplier_id: parseInt(document.getElementById('product-supplier').value),
+                stock: parseInt(document.getElementById('product-stock').value),
+                cost_price: parseFloat(document.getElementById('product-cost').value),
+                selling_price: parseFloat(document.getElementById('product-selling').value),
             };
 
             try {
@@ -195,34 +197,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     await api('POST', '/api/admin/products', productData);
                 }
                 modal.style.display = 'none';
-                loadProducts(searchInput.value);
-            } catch(err) { alert(`Error: ${err.message}`); }
+                loadProducts(searchInput.value); // Refresh list
+            } catch(err) { alert(err.message); }
         });
 
+        // Edit/Delete Click Handler
         tableBody.addEventListener('click', async (e) => {
             const id = e.target.dataset.id;
             if (e.target.classList.contains('btn-edit')) {
-                try {
-                    const products = await api('GET', '/api/admin/products');
-                    const product = products.find(p => p.product_id == id);
-                    if(!product) return;
-                    document.getElementById('product-id').value = product.product_id;
-                    document.getElementById('product-name').value = product.product_name;
-                    document.getElementById('product-category').value = product.category_id;
-                    document.getElementById('product-supplier').value = product.supplier_id;
-                    document.getElementById('product-stock').value = product.stock;
-                    document.getElementById('product-cost').value = product.cost_price;
-                    document.getElementById('product-selling').value = product.selling_price;
+                // Fetch specific product details to ensure fresh data
+                const products = await api('GET', `/api/admin/products`); 
+                const p = products.find(x => x.product_id == id);
+                if(p) {
+                    document.getElementById('product-id').value = p.product_id;
+                    document.getElementById('product-name').value = p.product_name;
+                    document.getElementById('product-category').value = p.category_id;
+                    document.getElementById('product-supplier').value = p.supplier_id;
+                    document.getElementById('product-stock').value = p.stock;
+                    document.getElementById('product-cost').value = p.cost_price;
+                    document.getElementById('product-selling').value = p.selling_price;
                     document.getElementById('modal-title').textContent = 'Edit Product';
                     modal.style.display = 'flex';
-                } catch(err) { console.error(err); }
+                }
             }
             if (e.target.classList.contains('btn-delete')) {
-                if (confirm('Are you sure you want to delete this product?')) {
-                    try {
-                        await api('DELETE', `/api/admin/products/${id}`);
-                        loadProducts(searchInput.value);
-                    } catch(err) { alert(`Error: ${err.message}`); }
+                if (confirm('Delete this product?')) {
+                    await api('DELETE', `/api/admin/products/${id}`);
+                    loadProducts(searchInput.value);
                 }
             }
         });
@@ -233,17 +234,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ADMIN CATEGORIES ---
     if (page.endsWith('/admin-categories.html')) {
-        // ... (this logic is unchanged from the previous step) ...
         const tableBody = document.getElementById('categories-table-body');
-        const searchInput = document.getElementById('category-search');
         const modal = document.getElementById('category-modal');
-        const form = document.getElementById('category-form');
+        const searchInput = document.getElementById('category-search');
 
         const loadCategories = (search = '') => {
             api('GET', `/api/admin/categories?search=${search}`).then(data => {
-                if(!data) return;
                 tableBody.innerHTML = '';
-                data.forEach(c => {
+                // Optional: Sort Categories Alphabetically
+                if(data) data.sort((a,b) => a.category_name.localeCompare(b.category_name));
+                
+                if(data) data.forEach(c => {
                     tableBody.innerHTML += `
                         <tr>
                             <td>${c.category_id}</td>
@@ -254,93 +255,85 @@ document.addEventListener('DOMContentLoaded', () => {
                             </td>
                         </tr>`;
                 });
-            }).catch(err => console.error(err));
+            });
         };
-        
-        searchInput.addEventListener('input', (e) => loadCategories(e.target.value));
+
+        searchInput.addEventListener('input', debounce((e) => loadCategories(e.target.value), 300));
         
         document.getElementById('add-category-btn').addEventListener('click', () => {
-            form.reset();
+            document.getElementById('category-form').reset();
             document.getElementById('category-id').value = '';
-            document.getElementById('modal-title').textContent = 'Add New Category';
+            document.getElementById('modal-title').textContent = 'Add Category';
             modal.style.display = 'flex';
         });
         document.getElementById('close-modal').addEventListener('click', () => modal.style.display = 'none');
-        
-        form.addEventListener('submit', async (e) => {
+
+        document.getElementById('category-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('category-id').value;
             const data = { category_name: document.getElementById('category-name').value };
             try {
-                if (id) {
-                    await api('PUT', `/api/admin/categories/${id}`, data);
-                } else {
-                    await api('POST', '/api/admin/categories', data);
-                }
+                if (id) await api('PUT', `/api/admin/categories/${id}`, data);
+                else await api('POST', '/api/admin/categories', data);
                 modal.style.display = 'none';
                 loadCategories(searchInput.value);
-            } catch(err) { alert(`Error: ${err.message}`); }
+            } catch(err) { alert(err.message); }
         });
 
         tableBody.addEventListener('click', async (e) => {
-            const id = e.target.dataset.id;
             if (e.target.classList.contains('btn-edit')) {
-                document.getElementById('category-id').value = id;
+                document.getElementById('category-id').value = e.target.dataset.id;
                 document.getElementById('category-name').value = e.target.dataset.name;
                 document.getElementById('modal-title').textContent = 'Edit Category';
                 modal.style.display = 'flex';
             }
             if (e.target.classList.contains('btn-delete')) {
-                if (confirm('Are you sure you want to delete this category?')) {
-                    try {
-                        await api('DELETE', `/api/admin/categories/${id}`);
-                        loadCategories(searchInput.value);
-                    } catch(err) { alert(`Error: ${err.message}`); }
+                if (confirm('Delete category?')) {
+                    await api('DELETE', `/api/admin/categories/${e.target.dataset.id}`);
+                    loadCategories(searchInput.value);
                 }
             }
         });
-        
         loadCategories();
     }
-    
+
     // --- ADMIN SUPPLIERS ---
     if (page.endsWith('/admin-suppliers.html')) {
-        // ... (this logic is unchanged from the previous step) ...
+        // ... (Logic is identical to Categories but with more fields. Use Debounce here too!)
         const tableBody = document.getElementById('suppliers-table-body');
-        const searchInput = document.getElementById('supplier-search');
         const modal = document.getElementById('supplier-modal');
         const form = document.getElementById('supplier-form');
+        const searchInput = document.getElementById('supplier-search');
 
         const loadSuppliers = (search = '') => {
             api('GET', `/api/admin/suppliers?search=${search}`).then(data => {
-                if(!data) return;
                 tableBody.innerHTML = '';
-                data.forEach(s => {
+                if(data) data.forEach(s => {
                     tableBody.innerHTML += `
                         <tr>
                             <td>${s.supplier_id}</td>
                             <td>${s.supplier_name}</td>
-                            <td>${s.contact_email || ''}</td>
-                            <td>${s.contact_phone || ''}</td>
+                            <td>${s.contact_email || '-'}</td>
+                            <td>${s.contact_phone || '-'}</td>
                             <td>
                                 <button class="btn-edit" data-id="${s.supplier_id}">Edit</button>
                                 <button class="btn-delete" data-id="${s.supplier_id}">Delete</button>
                             </td>
                         </tr>`;
                 });
-            }).catch(err => console.error(err));
+            });
         };
-        
-        searchInput.addEventListener('input', (e) => loadSuppliers(e.target.value));
+
+        searchInput.addEventListener('input', debounce((e) => loadSuppliers(e.target.value), 300));
         
         document.getElementById('add-supplier-btn').addEventListener('click', () => {
             form.reset();
             document.getElementById('supplier-id').value = '';
-            document.getElementById('modal-title').textContent = 'Add New Supplier';
+            document.getElementById('modal-title').textContent = 'Add Supplier';
             modal.style.display = 'flex';
         });
         document.getElementById('close-modal').addEventListener('click', () => modal.style.display = 'none');
-        
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('supplier-id').value;
@@ -350,39 +343,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 contact_phone: document.getElementById('supplier-phone').value,
             };
             try {
-                if (id) {
-                    await api('PUT', `/api/admin/suppliers/${id}`, data);
-                } else {
-                    await api('POST', '/api/admin/suppliers', data);
-                }
+                if (id) await api('PUT', `/api/admin/suppliers/${id}`, data);
+                else await api('POST', '/api/admin/suppliers', data);
                 modal.style.display = 'none';
                 loadSuppliers(searchInput.value);
-            } catch(err) { alert(`Error: ${err.message}`); }
-        });
-
-        tableBody.addEventListener('click', async (e) => {
-            const id = e.target.dataset.id;
-            if (e.target.classList.contains('btn-edit')) {
-                const suppliers = await api('GET', '/api/admin/suppliers');
-                const s = suppliers.find(s => s.supplier_id == id);
-                if (!s) return;
-                document.getElementById('supplier-id').value = s.supplier_id;
-                document.getElementById('supplier-name').value = s.supplier_name;
-                document.getElementById('supplier-email').value = s.contact_email;
-                document.getElementById('supplier-phone').value = s.contact_phone;
-                document.getElementById('modal-title').textContent = 'Edit Supplier';
-                modal.style.display = 'flex';
-            }
-            if (e.target.classList.contains('btn-delete')) {
-                if (confirm('Are you sure you want to delete this supplier?')) {
-                    try {
-                        await api('DELETE', `/api/admin/suppliers/${id}`);
-                        loadSuppliers(searchInput.value);
-                    } catch(err) { alert(`Error: ${err.message}`); }
-                }
-            }
+            } catch(err) { alert(err.message); }
         });
         
+        // Add Edit/Delete listeners (same as Products)
+        tableBody.addEventListener('click', async (e) => {
+             const id = e.target.dataset.id;
+             if (e.target.classList.contains('btn-edit')) {
+                 const suppliers = await api('GET', '/api/admin/suppliers');
+                 const s = suppliers.find(x => x.supplier_id == id);
+                 if(s) {
+                     document.getElementById('supplier-id').value = s.supplier_id;
+                     document.getElementById('supplier-name').value = s.supplier_name;
+                     document.getElementById('supplier-email').value = s.contact_email;
+                     document.getElementById('supplier-phone').value = s.contact_phone;
+                     document.getElementById('modal-title').textContent = 'Edit Supplier';
+                     modal.style.display = 'flex';
+                 }
+             }
+             if (e.target.classList.contains('btn-delete')) {
+                 if(confirm('Delete Supplier?')) {
+                     await api('DELETE', `/api/admin/suppliers/${id}`);
+                     loadSuppliers(searchInput.value);
+                 }
+             }
+        });
+
         loadSuppliers();
     }
 
@@ -390,117 +380,104 @@ document.addEventListener('DOMContentLoaded', () => {
     if (page.endsWith('/admin-orders.html')) {
         const tableBody = document.getElementById('orders-table-body');
         const searchInput = document.getElementById('order-search');
-        // *** NEW: Get modal elements ***
         const invoiceModal = document.getElementById('invoice-modal');
-        const closeInvoiceModal = document.getElementById('close-invoice-modal');
-        
-        if (closeInvoiceModal) {
-            closeInvoiceModal.addEventListener('click', () => {
-                invoiceModal.style.display = 'none';
-            });
+
+        if (document.getElementById('close-invoice-modal')) {
+            document.getElementById('close-invoice-modal').addEventListener('click', () => invoiceModal.style.display = 'none');
         }
-        
+
         const loadOrders = (search = '') => {
             api('GET', `/api/admin/orders?search=${search}`).then(data => {
-                if(!data) return;
                 tableBody.innerHTML = '';
+                if (!data) return;
+
+                // SORTING: Newest Orders First
+                data.sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
+
                 data.forEach(o => {
-                    let actions = '';
-                    // *** NEW: Updated Actions Logic ***
-                    if (o.status === 'Pending Payment') {
-                        actions = `<button class="btn-delete btn-cancel-order" data-id="${o.order_id}">Cancel</button>`;
-                    } else {
-                        // Show "View Details" for all other statuses (Paid, Cancelled)
-                        actions = `<button class="btn-edit btn-view-details" data-id="${o.order_id}">View Details</button>`;
-                    }
-                    
+                    // Check status carefully. Assuming backend uses "Pending Payment"
+                    const canCancel = o.status === 'Pending Payment'; 
+                    const actions = canCancel 
+                        ? `<button class="btn-delete btn-cancel" data-id="${o.order_id}">Cancel</button>
+                           <button class="btn-edit btn-view" data-id="${o.order_id}">Details</button>`
+                        : `<button class="btn-edit btn-view" data-id="${o.order_id}">Details</button>`;
+
                     tableBody.innerHTML += `
                         <tr>
                             <td>${o.order_id}</td>
                             <td>${o.customer_name}</td>
                             <td>${new Date(o.order_date).toLocaleDateString()}</td>
-                            <td>$${o.total_amount || 0}</td>
+                            <td>$${parseFloat(o.total_amount).toFixed(2)}</td>
                             <td>${o.status}</td>
                             <td>${actions}</td>
                         </tr>`;
                 });
-            }).catch(err => console.error(err));
+            });
         };
 
+        searchInput.addEventListener('input', debounce((e) => loadOrders(e.target.value), 300));
+
         tableBody.addEventListener('click', async (e) => {
-            const orderId = e.target.dataset.id;
-            if (e.target.classList.contains('btn-cancel-order')) {
-                if (confirm(`Are you sure you want to cancel order #${orderId}?`)) {
-                    try {
-                        await api('PUT', `/api/admin/orders/${orderId}/cancel`);
-                        loadOrders(searchInput.value); // Refresh the list
-                    } catch (err) {
-                        alert(`Error: ${err.message}`);
-                    }
+            const id = e.target.dataset.id;
+            if (e.target.classList.contains('btn-cancel')) {
+                if (confirm(`Cancel Order #${id}?`)) {
+                    await api('PUT', `/api/admin/orders/${id}/cancel`);
+                    loadOrders(searchInput.value);
                 }
             }
-            
-            // *** NEW: Handle View Details click ***
-            if (e.target.classList.contains('btn-view-details')) {
-                try {
-                    const data = await api('GET', `/api/admin/orders/${orderId}`);
-                    const { order, items } = data;
-                    
-                    // Populate modal
-                    document.getElementById('invoice-order-id').textContent = order.order_id;
-                    document.getElementById('invoice-customer-name').textContent = order.customer_name; // Admin sees customer name
-                    document.getElementById('invoice-order-date').textContent = new Date(order.order_date).toLocaleDateString();
-                    document.getElementById('invoice-order-status').textContent = order.status;
-                    document.getElementById('invoice-grand-total').textContent = `$${parseFloat(order.total_amount).toFixed(2)}`;
-                    
-                    const itemsBody = document.getElementById('invoice-items-body');
-                    itemsBody.innerHTML = '';
-                    items.forEach(item => {
-                        const itemTotal = parseFloat(item.price_snapshot) * item.quantity;
-                        itemsBody.innerHTML += `
-                            <tr>
-                                <td>${item.product_name_snapshot}</td>
-                                <td>$${parseFloat(item.price_snapshot).toFixed(2)}</td>
-                                <td>${item.quantity}</td>
-                                <td>$${itemTotal.toFixed(2)}</td>
-                            </tr>
-                        `;
-                    });
-                    
-                    // Show modal
-                    invoiceModal.style.display = 'flex';
-                    
-                } catch (err) {
-                    alert(`Error fetching order details: ${err.message}`);
-                }
+            if (e.target.classList.contains('btn-view')) {
+                const data = await api('GET', `/api/admin/orders/${id}`);
+                const { order, items } = data;
+                
+                document.getElementById('invoice-order-id').textContent = order.order_id;
+                document.getElementById('invoice-customer-name').textContent = order.customer_name;
+                document.getElementById('invoice-order-date').textContent = new Date(order.order_date).toLocaleDateString();
+                document.getElementById('invoice-order-status').textContent = order.status;
+                document.getElementById('invoice-grand-total').textContent = `$${parseFloat(order.total_amount).toFixed(2)}`;
+                
+                const itemsBody = document.getElementById('invoice-items-body');
+                itemsBody.innerHTML = '';
+                items.forEach(item => {
+                    itemsBody.innerHTML += `
+                        <tr>
+                            <td>${item.product_name_snapshot}</td>
+                            <td>$${parseFloat(item.price_snapshot).toFixed(2)}</td>
+                            <td>${item.quantity}</td>
+                            <td>$${(item.price_snapshot * item.quantity).toFixed(2)}</td>
+                        </tr>`;
+                });
+                invoiceModal.style.display = 'flex';
             }
         });
-
-        searchInput.addEventListener('input', (e) => loadOrders(e.target.value));
         loadOrders();
     }
 
     // --- ADMIN PROFILE ---
     if (page.endsWith('/admin-profile.html')) {
-        // ... (this logic is unchanged from the previous step) ...
-        api('GET', '/api/admin/profile').then(user => {
-            if (user) {
-                document.getElementById('profile-username').value = user.username;
-                document.getElementById('profile-email').value = user.email;
-                document.getElementById('profile-phone').value = user.phone || '';
+        const msg = (id, txt, success) => {
+            const el = document.getElementById(id);
+            el.textContent = txt;
+            el.style.color = success ? 'green' : 'red';
+            setTimeout(() => el.textContent = '', 3000);
+        };
+
+        api('GET', '/api/admin/profile').then(u => {
+            if(u) {
+                document.getElementById('profile-username').value = u.username;
+                document.getElementById('profile-email').value = u.email;
+                document.getElementById('profile-phone').value = u.phone || '';
             }
-        }).catch(err => console.error(err));
+        });
 
         document.getElementById('profile-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
-                email: document.getElementById('profile-email').value,
-                phone: document.getElementById('profile-phone').value
-            };
             try {
-                const result = await api('PUT', '/api/admin/profile', data);
-                showMessage('profile-message', result.message, true);
-            } catch(err) { showMessage('profile-message', err.message, false); }
+                const res = await api('PUT', '/api/admin/profile', {
+                    email: document.getElementById('profile-email').value,
+                    phone: document.getElementById('profile-phone').value
+                });
+                msg('profile-message', res.message, true);
+            } catch(e) { msg('profile-message', e.message, false); }
         });
 
         document.getElementById('password-form').addEventListener('submit', async (e) => {
@@ -509,16 +486,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const newPassword = document.getElementById('new-password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             
-            if (newPassword !== confirmPassword) {
-                showMessage('password-message', 'New passwords do not match.', false);
-                return;
-            }
-            const data = { currentPassword, newPassword };
+            if (newPassword !== confirmPassword) return msg('password-message', 'Passwords do not match', false);
+            
             try {
-                const result = await api('PUT', '/api/admin/change-password', data);
-                showMessage('password-message', result.message, true);
+                const res = await api('PUT', '/api/admin/change-password', { currentPassword, newPassword });
+                msg('password-message', res.message, true);
                 e.target.reset();
-            } catch(err) { showMessage('password-message', err.message, false); }
+            } catch(err) { msg('password-message', err.message, false); }
+        });
+    }
+
+    // --- LOGOUT ---
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = '/login.html';
         });
     }
 });

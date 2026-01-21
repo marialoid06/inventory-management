@@ -1,9 +1,9 @@
 -- 1. Create and Use the Database
+DROP DATABASE IF EXISTS inventory_pro;
 CREATE DATABASE IF NOT EXISTS inventory_pro;
 USE inventory_pro;
 
--- 2. Drop Existing Tables (in reverse order of creation)
--- This allows the script to be re-run by dropping old tables first.
+-- 2. Drop Existing Tables
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS cart_items;
 DROP TABLE IF EXISTS orders;
@@ -12,8 +12,7 @@ DROP TABLE IF EXISTS suppliers;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS users;
 
-
--- 3. Create New Tables with "Dummy-Proof" Constraints
+-- 3. Create Tables
 
 -- Users Table
 CREATE TABLE users (
@@ -69,15 +68,12 @@ CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    -- *** UPDATED ENUM AS REQUESTED ***
     status ENUM('Pending Payment', 'Paid', 'Cancelled', 'Out of Stock') NOT NULL DEFAULT 'Pending Payment',
-    
     total_amount DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES users(user_id)
 );
 
--- Order Items Table (The "Snapshot" Table)
+-- Order Items Table
 CREATE TABLE order_items (
     order_item_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
@@ -104,12 +100,11 @@ CREATE TABLE cart_items (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
-
 USE inventory_pro;
-SELECT * FROM products;
-SELECT * FROM categories;
-SELECT * FROM suppliers;
-SELECT * FROM users;
-SELECT * FROM orders;
-SELECT * FROM order_items;
-SELECT * FROM cart_items;
+SELECT*FROM products;
+SELECT*FROM categories;
+SELECT*FROM suppliers;
+SELECT*FROM users;
+SELECT*FROM orders;
+SELECT*FROM order_items;
+SELECT*FROM cart_items;

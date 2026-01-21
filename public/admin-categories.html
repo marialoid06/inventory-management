@@ -2,66 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Categories - InventoryPlus</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title>Categories - InventoryPlus</title>
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body>
-    <div class="admin-layout">
-        <nav class="sidebar">
-            <div class="sidebar-header"><h2>InventoryPlus</h2></div>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">InventoryPlus Admin</div>
             <ul>
-                <li><a href="/admin-dashboard.html">Dashboard</a></li>
-                <li><a href="/admin-products.html">Products</a></li>
-                <li class="active"><a href="/admin-categories.html">Categories</a></li>
-                <li><a href="/admin-suppliers.html">Suppliers</a></li>
-                <li><a href="/admin-orders.html">Orders</a></li>
-                <li><a href="/admin-profile.html">Profile</a></li>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="admin-products.html">Products</a></li>
+                <li><a href="admin-categories.html" class="active">Categories</a></li>
+                <li><a href="admin-suppliers.html">Suppliers</a></li>
+                <li><a href="admin-orders.html">Orders</a></li>
+                <li><a href="admin-profile.html">Settings</a></li>
+                <li><a href="#" id="logout-btn">Logout</a></li>
             </ul>
-            <div class="sidebar-footer"><a href="#" id="logout-btn">Logout</a></div>
-        </nav>
+        </aside>
 
         <main class="main-content">
-            <header class="main-header">
-                <h1 id="page-title">Categories</h1>
-                <span id="welcome-message"></span>
-                <button class="btn" id="add-category-btn">+ Add Category</button>
+            <header class="page-header">
+                <h2>Categories</h2>
+                <button id="add-category-btn" class="btn-primary">+ Add Category</button>
             </header>
-            <div class="search-container">
-                <input type="search" id="category-search" placeholder="Search categories...">
+
+            <div class="controls">
+                <input type="text" id="category-search" placeholder="Search categories...">
             </div>
-            <section class="content-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Category ID</th>
-                            <th>Category Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="categories-table-body"></tbody>
-                </table>
-            </section>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Category Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="categories-table-body"></tbody>
+            </table>
         </main>
     </div>
 
-    <!-- Add/Edit Category Modal -->
-    <div class="modal" id="category-modal">
+    <div id="category-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" id="close-modal">&times;</span>
-            <h2 id="modal-title">Add New Category</h2>
+            <span id="close-modal" class="close">&times;</span>
+            <h3 id="modal-title">Add Category</h3>
             <form id="category-form">
                 <input type="hidden" id="category-id">
                 <div class="form-group">
-                    <label for="category-name">Category Name *</label>
+                    <label>Category Name</label>
                     <input type="text" id="category-name" required>
                 </div>
-                <button type="submit" class="btn">Save Category</button>
+                <button type="submit" class="btn-submit">Save</button>
             </form>
         </div>
     </div>
-
     <script src="admin.js"></script>
 </body>
 </html>

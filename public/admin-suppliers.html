@@ -2,72 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Suppliers - InventoryPlus</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title>Suppliers - InventoryPlus</title>
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body>
-    <div class="admin-layout">
-        <nav class="sidebar">
-            <div class="sidebar-header"><h2>InventoryPlus</h2></div>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo">InventoryPlus Admin</div>
             <ul>
-                <li><a href="/admin-dashboard.html">Dashboard</a></li>
-                <li><a href="/admin-products.html">Products</a></li>
-                <li><a href="/admin-categories.html">Categories</a></li>
-                <li class="active"><a href="/admin-suppliers.html">Suppliers</a></li>
-                <li><a href="/admin-orders.html">Orders</a></li>
-                <li><a href="/admin-profile.html">Profile</a></li>
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="admin-products.html">Products</a></li>
+                <li><a href="admin-categories.html">Categories</a></li>
+                <li><a href="admin-suppliers.html" class="active">Suppliers</a></li>
+                <li><a href="admin-orders.html">Orders</a></li>
+                <li><a href="admin-profile.html">Settings</a></li>
+                <li><a href="#" id="logout-btn">Logout</a></li>
             </ul>
-            <div class="sidebar-footer"><a href="#" id="logout-btn">Logout</a></div>
-        </nav>
+        </aside>
 
         <main class="main-content">
-            <header class="main-header">
-                <h1 id="page-title">Suppliers</h1>
-                <span id="welcome-message"></span>
-                <button class="btn" id="add-supplier-btn">+ Add Supplier</button>
+            <header class="page-header">
+                <h2>Suppliers</h2>
+                <button id="add-supplier-btn" class="btn-primary">+ Add Supplier</button>
             </header>
-            <div class="search-container">
-                <input type="search" id="supplier-search" placeholder="Search suppliers...">
+
+            <div class="controls">
+                <input type="text" id="supplier-search" placeholder="Search suppliers...">
             </div>
-            <section class="content-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="suppliers-table-body"></tbody>
-                </table>
-            </section>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="suppliers-table-body"></tbody>
+            </table>
         </main>
     </div>
 
-    <!-- Add/Edit Supplier Modal -->
-    <div class="modal" id="supplier-modal">
+    <div id="supplier-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" id="close-modal">&times;</span>
-            <h2 id="modal-title">Add New Supplier</h2>
+            <span id="close-modal" class="close">&times;</span>
+            <h3 id="modal-title">Add Supplier</h3>
             <form id="supplier-form">
                 <input type="hidden" id="supplier-id">
                 <div class="form-group">
-                    <label for="supplier-name">Supplier Name *</label>
+                    <label>Supplier Name</label>
                     <input type="text" id="supplier-name" required>
                 </div>
                 <div class="form-group">
-                    <label for="supplier-email">Contact Email</label>
-                    <input type="email" id="supplier-email">
+                    <label>Email</label>
+                    <input type="email" id="supplier-email" required>
                 </div>
                 <div class="form-group">
-                    <label for="supplier-phone">Contact Phone</label>
-                    <input type="tel" id="supplier-phone">
+                    <label>Phone</label>
+                    <input type="text" id="supplier-phone" required>
                 </div>
-                <button type="submit" class="btn">Save Supplier</button>
+                <button type="submit" class="btn-submit">Save</button>
             </form>
         </div>
     </div>

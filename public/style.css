@@ -10,13 +10,62 @@
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
-    display: grid;
-    place-items: center;
     min-height: 100vh;
     color: #333;
+    /* CHANGED: Removed 'display: grid' so full pages work */
+    display: block; 
 }
 
-/* --- Auth Card --- */
+/* --- Layout Containers --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Use this wrapper in your Login/Register HTML if you want them centered */
+.auth-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Navigation Bar (NEW) --- */
+.navbar {
+    background: #1a2b4d;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar .logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* --- Auth Card (Existing) --- */
 .auth-container {
     background: #ffffff;
     width: 400px;
@@ -24,6 +73,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     border: 1px solid #e0e0e0;
+    margin: 0 auto; /* Ensures centering if wrapper is missing */
 }
 
 .auth-container h2 {
@@ -38,7 +88,7 @@ body {
     margin-bottom: 2rem;
 }
 
-/* --- Form --- */
+/* --- Forms (Used everywhere) --- */
 .form-group {
     margin-bottom: 1.25rem;
     position: relative;
@@ -51,7 +101,10 @@ body {
     color: #444;
 }
 
-.form-group input {
+/* Standardized Input Styling */
+.form-group input, 
+.filters input, 
+.filters select {
     width: 100%;
     padding: 0.8rem 1rem;
     border: 1px solid #ccc;
@@ -61,30 +114,16 @@ body {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-group input:focus {
+.form-group input:focus, 
+.filters input:focus, 
+.filters select:focus {
     outline: none;
     border-color: #4a90e2;
     box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
 
-/* --- Password Toggle --- */
-.password-wrapper {
-    position: relative;
-}
-
-.toggle-password {
-    position: absolute;
-    right: 12px;
-    top: 39px; /* Adjust based on label */
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    color: #888;
-}
-
-/* --- Button --- */
-.btn {
+/* --- Buttons --- */
+.btn, .btn-primary {
     width: 100%;
     padding: 0.9rem;
     border: none;
@@ -95,14 +134,226 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: background 0.3s, box-shadow 0.3s;
+    text-align: center;
 }
 
-.btn:hover {
+.btn:hover, .btn-primary:hover {
     background: linear-gradient(135deg, #0056b3, #4a90e2);
     box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
 }
 
-/* --- Links & Messages --- */
+.btn:disabled, .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* --- Password Toggle --- */
+.password-wrapper { position: relative; }
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 39px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #888;
+}
+
+/* --- Shop Page Styles (NEW) --- */
+.filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.filters input, .filters select {
+    max-width: 300px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2rem;
+}
+
+.product-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card h3 {
+    margin-bottom: 0.5rem;
+    color: #1a2b4d;
+}
+
+.product-card .category {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-card .price {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #28a745;
+    margin-top: auto; /* Pushes price to bottom before buttons */
+}
+
+.product-card .stock {
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.btn-add {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    width: 100%;
+}
+.btn-add:hover { background: #218838; }
+
+.btn-disabled {
+    background: #e0e0e0;
+    color: #888;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 6px;
+    cursor: not-allowed;
+    width: 100%;
+}
+
+/* --- Cart Styles (NEW) --- */
+.cart-container table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.cart-container th, .cart-container td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.cart-container th {
+    background: #f8f9fa;
+    color: #1a2b4d;
+}
+
+.qty-input {
+    width: 60px !important;
+    padding: 5px !important;
+}
+
+.btn-remove {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cart-summary {
+    margin-top: 2rem;
+    text-align: right;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.cart-summary h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #1a2b4d;
+}
+
+.cart-summary .btn-primary {
+    max-width: 200px;
+}
+
+/* --- Order History Styles (NEW) --- */
+.order-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 5px solid #1a2b4d;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status.pending-payment { background: #fff3cd; color: #856404; }
+.status.completed { background: #d4edda; color: #155724; }
+.status.cancelled { background: #f8d7da; color: #721c24; }
+
+.btn-cancel {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+/* --- Profile Page (NEW) --- */
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+    color: #1a2b4d;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+/* --- Links & Footer (Existing) --- */
 .form-links {
     display: flex;
     justify-content: space-between;
@@ -124,19 +375,6 @@ p.bottom-link {
     margin-top: 1.5rem;
 }
 
-/* For success/error messages */
-#message {
-    text-align: center;
-    margin-top: 1rem;
-    padding: 0.8rem;
-    border-radius: 6px;
-    font-weight: 500;
-}
-.message-success {
-    background: #e6f7ec;
-    color: #006421;
-}
-.message-error {
-    background: #fdecea;
-    color: #a80000;
-}
+/* --- Messages --- */
+.message-success { background: #e6f7ec; color: #006421; padding: 0.5rem; border-radius: 4px;}
+.message-error { background: #fdecea; color: #a80000; padding: 0.5rem; border-radius: 4px;}
